@@ -16,6 +16,15 @@ class CupcakeController extends Controller
     }
 
 
+    /**
+     * Display a single resource.
+     */
+    public function show(int $id) {
+        return response()->json(Cupcake::findOrFail($id));
+    }
+
+
+    // public function 
     
 
 }
