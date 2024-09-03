@@ -9,18 +9,23 @@ class Cupcake extends Model
 {
     use HasFactory;
 
-    // /**
-    //  * The attributes that are mass assignable.
-    //  *
-    //  * @var array<int, string>
-    //  */
-    // protected $fillable = [
-    //     'name',
-    //     'price_in_cents',
-    //     'photo_url',
-    //     'is_available'
-    // ];
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array<int, string>
+     */
+    protected $fillable = [
+        'name',
+        'price_in_cents',
+        'photo_url',
+        'description',
+        'quantity',
+        'is_available',
+        'is_advertised'
+    ];
 
+
+    
 
 
 }

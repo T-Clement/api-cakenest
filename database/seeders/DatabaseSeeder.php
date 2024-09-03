@@ -24,6 +24,11 @@ class DatabaseSeeder extends Seeder
         Cupcake::factory()->count(10)->create();
 
 
+        // category sucré / salé / gluten-free
+
+        //ingredients
+
+        //commandes
 
     }
 }
