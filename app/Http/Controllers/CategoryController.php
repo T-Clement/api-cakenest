@@ -27,9 +27,12 @@ class CategoryController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Category $category)
+    public function show(int $id)
     {
-        
+        $category = Category::findOrFail($id)->load('cupcakes');
+        return $category;
+        // $category->load(["cupcakes"]);
+        // return $category->get();
     }
 
 

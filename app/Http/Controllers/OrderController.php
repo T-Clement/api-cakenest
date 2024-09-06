@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Cupcake;
-use App\Models\order;
+use App\Models\Order;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -115,7 +115,7 @@ class OrderController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(order $order)
+    public function show(Order $order)
     {
         //
     }
@@ -124,7 +124,7 @@ class OrderController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, order $order)
+    public function update(Request $request, Order $order)
     {
         //
     }
@@ -132,7 +132,7 @@ class OrderController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(order $order)
+    public function destroy(Order $order)
     {
         //
     }
