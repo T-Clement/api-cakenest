@@ -3,9 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\Cupcake\StoreCupcakeRequest;
-use App\Http\Resources\CupcakeResource;
+use App\Http\Resources\CupcakeCollection;
+// use App\Http\Resources\CupcakeResource;
 use App\Models\Cupcake;
-use Illuminate\Database\Eloquent\Builder;
+// use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 
 class CupcakeController extends Controller
@@ -50,7 +51,7 @@ class CupcakeController extends Controller
         $cupcakes->appends($request->except('page'));
 
         // use of ressource to format response
-        return CupcakeResource::collection($cupcakes);
+        return new CupcakeCollection($cupcakes);
 
     }
 

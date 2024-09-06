@@ -17,6 +17,7 @@ class OrderController extends Controller
     {
         
         $user = $request->user();
+        
         if($user->is_admin) {
             return Order::with(['cupcakes', 'user'])->get();
         } else {
@@ -129,7 +130,7 @@ class OrderController extends Controller
 
         // load cupcakes related to order
         $order->cupcakes;
-        
+
         return $order;
     }
 

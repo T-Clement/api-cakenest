@@ -2,13 +2,13 @@
 
 Cupcakes : 
     Create: TODO
-    Read: possibility to sort by price asc / desc, search by name, search by category
+    Read: possibility to sort by price asc / desc, search by name, search by category + collection to format data on index()
     Update : TODO
     Delete : TODO
 
 Orders : 
     Create: OK, substract quantity in order of cupcake quantiy
-    Read: OK, a user can only get access to his orders, admin can get access to all orders 
+    Read: OK, a user can only get access to his orders, admin can get access to all orders (show and index)
 
 
 Categories :
