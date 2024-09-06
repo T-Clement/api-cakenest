@@ -15,18 +15,42 @@ class CupcakeController extends Controller
      */
     public function index(Request $request)
     {
-        return CupcakeResource::collection(Cupcake::paginate(5));
+        // return CupcakeResource::collection(Cupcake::paginate(5));
         
+        $query = Cupcake::query();
         
-        // ordre prix
+        // load categories relationship
+        $query->with(['categories']);
 
-        // nom
 
-        // 
-        
-        // return Cupcake::query()->when($request->search, function (Builder $builder) use ($request) {
-        //     $builder->where()
-        // });
+        // order by price
+        if($request->has('price') && in_array($request->input('price'), ['asc', 'desc'])) {
+            $query->orderBy('price_in_cents', $request->input("price"));
+        }
+
+        // get only categories in url
+        if($request->has('categories')) {
+            // convert categories 1,2,3 in array
+            $categories = explode(',', $request->input('categories'));
+            // check if category id of cupcake is in array of categories send in request
+            $query->whereHas('categories', function($q) use ($categories) {
+                $q->whereIn('categories.id', $categories);
+            });
+        }
+
+        // search by name
+        if($request->has('name')) {
+            $query->where('name', 'like', '%'. $request->input('name') .'%');
+        }
+
+        // add pagination
+        $cupcakes = $query->paginate(5);
+
+        // get all params on request and append it on url except for page param
+        $cupcakes->appends($request->except('page'));
+
+        // use of ressource to format response
+        return CupcakeResource::collection($cupcakes);
 
     }
 
