@@ -115,9 +115,22 @@ class OrderController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Order $order)
+    public function show(Request $request)
     {
-        //
+        $user = $request->user();
+        $order = Order::findOrFail($request->id);
+        
+        // if user order is not currently user connected, he can not access to order except if admin
+        if($order->user_id !== $user->id && !$user->is_admin) {
+            return response()->json([
+                "message" => "Ce n'est pas votre commande, vous n'êtes pas autorisé à la consulter"
+            ], 403);
+        }
+
+        // load cupcakes related to order
+        $order->cupcakes;
+        
+        return $order;
     }
 
 

@@ -21,6 +21,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::post('/cupcake/create', [CupcakeController::class, "store"])->name('cupcake.store');
     Route::get('/cupcake', [CupcakeController::class, 'index'])->name('cupcake.index');
     Route::get('/order', [OrderController::class, 'index'])->name('order.index');
+    Route::get('/order/{id}', [OrderController::class, 'show'])->name('order.show');
     Route::post('/order', [OrderController::class, 'store'])->name('order.store');
     
     Route::get("/category/{id}", [CategoryController::class, 'show'])->name("category.show");
@@ -30,17 +31,9 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::group(['middleware' => isAdmin::class], function() {
 
         Route::get('/admin/user', [UserController::class, function () {return User::all();}])->name('admin.users.index');
-
-        
-
     });
 });
 
 
-// categories à prendre en compte
-
-// pagination avec filtres de gardés
-
 // créer des ressources pour retourner les données dans une meilleur format
 
-// 

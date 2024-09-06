@@ -8,7 +8,7 @@ Cupcakes :
 
 Orders : 
     Create: OK, substract quantity in order of cupcake quantiy
-    Read: TODO
+    Read: OK, a user can only get access to his orders, admin can get access to all orders 
 
 
 Categories :

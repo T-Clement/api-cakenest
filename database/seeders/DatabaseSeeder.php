@@ -24,8 +24,16 @@ class DatabaseSeeder extends Seeder
             'is_admin' => true
         ]);
         
+        $notAdminUser = User::factory()->create([
+            'name' => 'Clem',
+            'email' => 'test@test.com',
+            'is_admin' => false
+        ]);
+
         $users = User::factory(10)->create();
-       
+        
+        // add not admin user to pool of user 
+        $users->push($notAdminUser);
 
         $categories = [
             ["name" => "Sucré", "created_at" => now()], 
@@ -53,7 +61,7 @@ class DatabaseSeeder extends Seeder
 
         // seed orders
         /** @var Order[] */
-        $orders = Order::factory(5)->recycle($users)->create();  // create but not saved immediately
+        $orders = Order::factory(10)->recycle($users)->create();  // create but not saved immediately
 
         foreach ($orders as $order) {
             // assign each order to a random user
