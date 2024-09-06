@@ -1,10 +1,10 @@
 ## About this API
 
 Cupcakes : 
-    Create: TODO
+    Create: OK
     Read: possibility to sort by price asc / desc, search by name, search by category + collection to format data on index()
     Update : TODO
-    Delete : TODO
+    Delete : OK
 
 Orders : 
     Create: OK, substract quantity in order of cupcake quantiy
@@ -13,6 +13,9 @@ Orders :
 
 Categories :
     Read : OK, return category and cupcake who have it
+
+
+Launch Seeder with php artisan migrate:fresh --seed to seed Database
 
 
 
