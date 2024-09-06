@@ -15,7 +15,7 @@ Categories :
     Read : OK, return category and cupcake who have it
 
 
-Launch Seeder with php artisan migrate:fresh --seed to seed Database
+Launch Seeder with php artisan migrate:fresh --seed to seed Database.
 
 
 
