@@ -1,18 +1,18 @@
 ## About this API
 
 Cupcakes : 
-    Create
-    Read: 
-    Update
-    Delete
+    Create: TODO
+    Read: possibility to sort by price asc / desc, search by name, search by category
+    Update : TODO
+    Delete : TODO
 
 Orders : 
-    Create: 
-    Read:
+    Create: OK, substract quantity in order of cupcake quantiy
+    Read: TODO
 
 
 Categories :
-    Read :
+    Read : OK, return category and cupcake who have it
 
 
 
