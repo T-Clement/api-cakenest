@@ -17,31 +17,31 @@ class CupcakeController extends Controller
     public function index(Request $request)
     {
         // return CupcakeResource::collection(Cupcake::paginate(5));
-        
+
         $query = Cupcake::query();
-        
+
         // load categories relationship
         $query->with(['categories']);
 
 
         // order by price
-        if($request->has('price') && in_array($request->input('price'), ['asc', 'desc'])) {
+        if ($request->has('price') && in_array($request->input('price'), ['asc', 'desc'])) {
             $query->orderBy('price_in_cents', $request->input("price"));
         }
 
         // get only categories in url
-        if($request->has('categories')) {
+        if ($request->has('categories')) {
             // convert categories 1,2,3 in array
             $categories = explode(',', $request->input('categories'));
             // check if category id of cupcake is in array of categories send in request
-            $query->whereHas('categories', function($q) use ($categories) {
+            $query->whereHas('categories', function ($q) use ($categories) {
                 $q->whereIn('categories.id', $categories);
             });
         }
 
         // search by name
-        if($request->has('name')) {
-            $query->where('name', 'like', '%'. $request->input('name') .'%');
+        if ($request->has('name')) {
+            $query->where('name', 'like', '%' . $request->input('name') . '%');
         }
 
         // add pagination
@@ -52,14 +52,14 @@ class CupcakeController extends Controller
 
         // use of ressource to format response
         return new CupcakeCollection($cupcakes);
-
     }
 
 
     /**
      * Display a single resource.
      */
-    public function show(int $id) {
+    public function show(int $id)
+    {
         // return response()->json(Cupcake::findOrFail($id));
         return Cupcake::findOrFail($id);
         // return Cupcake::findOr($id, function () {
@@ -70,14 +70,34 @@ class CupcakeController extends Controller
 
 
 
-    public function destroy(int $id) {
-        $cupcake = Cupcake::find($id);
-        if(!$cupcake) {
-            return response()->json(["message" => "Ooops not found"], 404);
+    public function destroy(Request $request, $id)
+    {
+
+
+        if (!$request->user() || !$request->user()->is_admin) {
+            return response()->json(['message' => 'Unauthorized'], 401);
         }
-        return $cupcake->destroy();
+
+        $cupcake = Cupcake::find($id);
+
+        if (!$cupcake) {
+            return response()->json(['message' => 'Cupcake not found'], 404);
+        }
+        
+        $cupcake->delete();
+
+        return response()->json(['message' => 'Cupcake deleted successfully'], 200);  
+
+
+
+        // return Cupcake::destroy($request->get("id"));
+        // $cupcake = Cupcake::find($id);
+        // if(!$cupcake) {
+        //     return response()->json(["message" => "Ooops not found"], 404);
+        // }
+        // return $cupcake->delete();
     }
-    
+
 
 
     /**
@@ -90,12 +110,12 @@ class CupcakeController extends Controller
 
 
 
-     /**
+    /**
      * Store a newly created resource in storage.
      */
     public function store(StoreCupcakeRequest $request)
     {
-        
+
         $validated = $request->validated();
 
         $cupcake = new Cupcake;
@@ -109,8 +129,5 @@ class CupcakeController extends Controller
 
 
         return $cupcake->save();
-
-        
     }
-
 }
