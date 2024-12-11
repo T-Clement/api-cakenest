@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CartController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CupcakeController;
 use App\Http\Controllers\OrderController;
@@ -24,6 +25,11 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     
     Route::get("/category/{id}", [CategoryController::class, 'show'])->name("category.show");
     
+
+    Route::post("/cart", [CartController::class, 'store'])->name("cart.store");
+    
+    Route::get('/user/${id}/cart', [CartController::class, "show"])->name("cart.show");
+
     
     // isAdmin routes
     Route::group(['middleware' => isAdmin::class], function() {

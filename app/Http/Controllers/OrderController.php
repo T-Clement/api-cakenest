@@ -95,7 +95,7 @@ class OrderController extends Controller
             // get cupcake from database
             $cupcake = Cupcake::findOrFail($orderCupcake['cupcake_id']);
 
-            // 
+            // add pivot data to pivot table
             $order->cupcakes()->attach($orderCupcake['cupcake_id'], [
                 'quantity' => $orderCupcake['quantity'],
                 'total_price_in_cents' => $cupcake->price_in_cents * $orderCupcake['quantity'], // calculate total_price with price from database and
