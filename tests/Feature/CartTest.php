@@ -139,7 +139,7 @@ test('an anonymous user can not get a cart', function () {
 // add cupcake (quantity > 0), delete (quantity = 0),
 // update the same cupcake by increasing or descreasing the quantity of one cupcake
 // 
-test("a user can update an empty cart by adding one cupcake", function () {
+test("a user can add a cupcake to an non empty cart", function () {
 
     // create cupcakes
     $cupcakes = Cupcake::factory()->count(10)->create(["quantity" => 10]);
@@ -155,18 +155,10 @@ test("a user can update an empty cart by adding one cupcake", function () {
         $cupcakes[4]->id => ['quantity' => 7]
     ]);
     
-    // dd($cart);
     $selectedCupcake = $cupcakes[0]->toArray();
 
-
-    // dd($selectedCupcake);
-
-
-
     // decrementation of quantity is handle in order.store
-
-
-    $response = actingAs($user)->patchJson(
+    $updatedCart = actingAs($user)->patchJson(
         route("cart.update", ["id" => $user->id]),
         [
             "cupcakes" => [
@@ -174,18 +166,28 @@ test("a user can update an empty cart by adding one cupcake", function () {
                     "cupcake_id" => $selectedCupcake['id'],
                     "quantity" => 9
                 ],
-                // [
-                //     "cupcake_id" => $cupcakes[0]->id,
-                //     "quantity" => 0
-                // ]
+                
             ]
         ]
     );
 
-    dd($response->json());
-    $response->dump();
+    $updatedCart->assertStatus(200);
+
+    // assert some other things to validate json
+
+
+    // dd($response->json());
+    // $response->dump();
 
     // $response->assert
+
+
+});
+
+
+
+test("a user can update an empty cart by adding one cupcake", function () {
+
 
 
 });
