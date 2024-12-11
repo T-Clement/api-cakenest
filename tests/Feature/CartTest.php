@@ -136,8 +136,10 @@ test('an anonymous user can not get a cart', function () {
 
 
 
-// add, delete
-test("a user can update his cart by adding a cupcake", function () {
+// add cupcake (quantity > 0), delete (quantity = 0),
+// update the same cupcake by increasing or descreasing the quantity of one cupcake
+// 
+test("a user can update an empty cart by adding one cupcake", function () {
 
     // create cupcakes
     $cupcakes = Cupcake::factory()->count(10)->create(["quantity" => 10]);
@@ -148,9 +150,14 @@ test("a user can update his cart by adding a cupcake", function () {
 
     // create Cart
     $cart = Cart::factory()->create(["user_id" => $user->id]);
+    $cart->cupcakes()->attach([
+        $cupcakes[1]->id => ['quantity' => 5], 
+        $cupcakes[4]->id => ['quantity' => 7]
+    ]);
+    
     // dd($cart);
-
     $selectedCupcake = $cupcakes[0]->toArray();
+
 
     // dd($selectedCupcake);
 
@@ -165,15 +172,19 @@ test("a user can update his cart by adding a cupcake", function () {
             "cupcakes" => [
                 [
                     "cupcake_id" => $selectedCupcake['id'],
-                    "quantity" => 2
-                ]
+                    "quantity" => 9
+                ],
+                // [
+                //     "cupcake_id" => $cupcakes[0]->id,
+                //     "quantity" => 0
+                // ]
             ]
         ]
     );
 
+    dd($response->json());
     $response->dump();
 
-    // dd($response);
     // $response->assert
 
 
