@@ -44,11 +44,23 @@ class CupcakeController extends Controller
             $query->where('name', 'like', '%' . $request->input('name') . '%');
         }
 
-        // add pagination
-        $cupcakes = $query->paginate(5);
 
-        // get all params on request and append it on url except for page param
-        $cupcakes->appends($request->except('page'));
+        // add conditionnal
+        // if($request->has('pagination') && $request->get('pagination') === true) {
+
+            $per_page = $request->input("per_page", 5);
+
+            // add pagination
+            $cupcakes = $query->paginate($per_page);
+
+
+            // dd($cupcakes);
+    
+            // get all params on request and append it on url except for page param
+            $cupcakes->appends($request->except('page'));
+
+        // }
+
 
         // use of ressource to format response
         return new CupcakeCollection($cupcakes);
@@ -127,7 +139,9 @@ class CupcakeController extends Controller
         $cupcake->is_available = $validated["is_available"];
         $cupcake->is_advertised = $validated["is_advertised"];
 
+        $cupcake->save();
 
-        return $cupcake->save();
+        // return $cupcake created
+        return response()->json($cupcake, 201);
     }
 }

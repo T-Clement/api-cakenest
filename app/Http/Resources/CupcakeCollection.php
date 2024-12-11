@@ -31,11 +31,6 @@ class CupcakeCollection extends ResourceCollection
                 ];
             })
         ];
-    }
-
-
-    public function with($request)
-    {
         return [
             'meta' => [
                 'current_page' => $this->currentPage(),
@@ -53,5 +48,30 @@ class CupcakeCollection extends ResourceCollection
     }
 
 
+    // public function with($request)
+    // {
+    //     // dd(['meta' => [
+    //     //         'current_page' => $this->currentPage(),
+    //     //         'last_page' => $this->lastPage(),
+    //     //         'per_page' => $this->perPage(),
+    //     //         'total' => $this->total(),
+    //     //     ]]);
+
+
+    //     return [
+    //         'meta' => [
+    //             'current_page' => $this->currentPage(),
+    //             'last_page' => $this->lastPage(),
+    //             'per_page' => $this->perPage(),
+    //             'total' => $this->total(),
+    //         ],
+    //         'links' => [
+    //             'first' => $this->url(1),
+    //             'last' => $this->url($this->lastPage()),
+    //             'prev' => $this->previousPageUrl(),
+    //             'next' => $this->nextPageUrl(),
+    //         ],
+    //     ];
+    // }
 
 }

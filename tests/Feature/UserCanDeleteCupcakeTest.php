@@ -17,6 +17,7 @@ test('admin user can delete a cupcake', function () {
     // dd($cupcake);
 
     // create an admin user
+    /** @var User */
     $adminUser = User::factory()->create(["is_admin" => true]);
 
 
@@ -43,13 +44,15 @@ test('logged in user can not delete a cupcake', function () {
 
 
     // create an admin user
+    /** @var User */
     $AuthenticatedUser = User::factory()->create(["is_admin" => false]);
 
 
     // logged this user
         // delete the cupcake
+    
     actingAs($AuthenticatedUser)
-        ->deleteJson(route("cupcake.delete", ["id" => $cupcake->id]), [])->assertStatus(401);
+        ->deleteJson(route("cupcake.delete", ["id" => $cupcake->id]), [])->assertStatus(403);
 
     // check if previous id cupcake is still existing 
     expect(Cupcake::get())->toHaveCount(1);
@@ -63,9 +66,9 @@ test('logged in user can not delete a cupcake', function () {
 
 
 test('anonymous user cannot deleted a cupcake', function () {
+    
     // add a cupcake to delete it after
     $cupcake = Cupcake::factory()->create();
-
 
     // logged this user
         // delete the cupcake
