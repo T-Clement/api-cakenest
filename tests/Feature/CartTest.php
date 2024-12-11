@@ -29,8 +29,6 @@ test('a logged-in user can create a cart', function () {
     ));
 
     $response->assertCreated();
-
-
 });
 
 
@@ -46,7 +44,6 @@ test('an anonymous user cannot create a cart', function () {
     ));
 
     $response->assertUnauthorized();
-
 });
 
 
@@ -75,7 +72,8 @@ test('a logged-in user can get his cart his previous / current cart', function (
 
 
     $cartFromDatabase = actingAs($user)->getJson(route(
-        "cart.show", ["id" => $user->id]
+        "cart.show",
+        ["id" => $user->id]
     ));
 
     $cartFromDatabase->assertStatus(200);
@@ -99,7 +97,6 @@ test('a logged-in user can get his cart his previous / current cart', function (
             ],
         ],
     ]);
-
 });
 
 
@@ -128,10 +125,56 @@ test('an anonymous user can not get a cart', function () {
 
 
     $response = getJson(route(
-        "cart.show", ["id" => $user->id]
+        "cart.show",
+        ["id" => $user->id]
     ));
 
     $response->assertUnauthorized();
+});
+
+
+
+
+
+// add, delete
+test("a user can update his cart by adding a cupcake", function () {
+
+    // create cupcakes
+    $cupcakes = Cupcake::factory()->count(10)->create(["quantity" => 10]);
+
+    // create User
+    /** @var User */
+    $user = User::factory()->create();
+
+    // create Cart
+    $cart = Cart::factory()->create(["user_id" => $user->id]);
+    // dd($cart);
+
+    $selectedCupcake = $cupcakes[0]->toArray();
+
+    // dd($selectedCupcake);
+
+
+
+    // decrementation of quantity is handle in order.store
+
+
+    $response = actingAs($user)->patchJson(
+        route("cart.update", ["id" => $user->id]),
+        [
+            "cupcakes" => [
+                [
+                    "cupcake_id" => $selectedCupcake['id'],
+                    "quantity" => 2
+                ]
+            ]
+        ]
+    );
+
+    $response->dump();
+
+    // dd($response);
+    // $response->assert
 
 
 });

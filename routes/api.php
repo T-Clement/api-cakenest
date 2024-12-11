@@ -28,7 +28,10 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 
     Route::post("/cart", [CartController::class, 'store'])->name("cart.store");
     
-    Route::get('/user/${id}/cart', [CartController::class, "show"])->name("cart.show");
+    Route::get('/user/{id}/cart', [CartController::class, "show"])->name("cart.show");
+
+    Route::patch('/user/{id}/cart', [CartController::class, "update"])->name("cart.update");
+
 
     
     // isAdmin routes

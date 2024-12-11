@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Cart;
+use App\Models\Cupcake;
 use COM;
 use Illuminate\Http\Request;
 
@@ -78,7 +79,95 @@ class CartController extends Controller
      */
     public function update(Request $request, Cart $cart)
     {
-        //
+
+
+        
+        
+        // cupcakes not in request are deleted
+        // cupcakes in request
+        
+        
+        // check if user in request is the owner of the cart
+        
+        $userId = $request->user()->id;
+        
+        $cart = Cart::where('user_id', $userId)->first();
+        // dd($cart->user_id);
+        // dd($userId);
+
+        if($cart->user_id !== $userId) {
+            dd("in if user not owner of cart");
+            return response("Unauthorized", 403);
+        } 
+
+        
+        
+        // validation
+        $validatedData = $request->validate([
+            "cupcakes" => "required|array",
+            "cupcakes.*.cupcake_id" => "required|exists:cupcakes,id",
+            "cupcakes.*.quantity" => "required|integer|min:0"
+        ]);
+        
+        // dd("after");
+
+        dd($validatedData);
+
+        // get cupcakes in cart
+        $currentCupcakes = $cart->cupcakes()->get();
+        dd($currentCupcakes);
+
+
+
+
+
+        $outOfStockCupcakes = [];
+
+        foreach($validatedData["cupcakes"] as $item) {
+            $cupcake = Cupcake::find($item["cupcake_id"]);
+
+
+            if($cupcake->quantity < $item["quantity"]) {
+                $outOfStockCupcakes[] = [
+                    "id" => $cupcake->id,
+                    "name" => $cupcake->name,
+                    "requested_quantity" => $item["quantity"],
+                    "available_quantity" => $cupcake->quantity
+                ];
+
+                continue;
+            }
+
+            $cart->cupcakes()->syncWithoutDetaching([
+                $cupcake->id => ["quantity" => $item["quantity"]]
+            ]);
+
+        }
+
+        if(!empty($outOfStockCupcakes)) {
+            return response()->json([
+                "message" => "Certains cupcakes ne sont pas disponibles en quantité suffisante",
+                "outOfStockCupcales" => $outOfStockCupcakes
+            ], 400);
+        }
+
+
+        $cart = Cart::where('user_id', $userId)->first();
+
+
+
+        return $cart->update($validatedData);
+
+
+
+
+
+
+
+
+     
+
+
     }
 
     /**

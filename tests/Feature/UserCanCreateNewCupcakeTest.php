@@ -59,3 +59,8 @@ test('An anonymous user can not store a new cupcake', function () {
     $response = postJson(route('cupcake.store', $cupcake->toArray()));
     $response->assertUnauthorized();
 });
+
+
+
+
+// test for not corrected values 
