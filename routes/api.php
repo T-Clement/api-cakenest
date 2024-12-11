@@ -16,6 +16,7 @@ Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
 
 
 Route::group(['middleware' => ['auth:sanctum']], function () {
+    Route::get("/test", function() {return ["test" => "test"]; });
     Route::get('/cupcake/{id}', [CupcakeController::class, 'show'])->name('cupcake.show');
     Route::get('/cupcake', [CupcakeController::class, 'index'])->name('cupcake.index');
     Route::get('/order', [OrderController::class, 'index'])->name('order.index');
@@ -25,7 +26,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::get("/category/{id}", [CategoryController::class, 'show'])->name("category.show");
     
     
-    // isAdmin routes
+    // // isAdmin routes
     Route::group(['middleware' => isAdmin::class], function() {
         Route::delete('/cupcake/{id}', [CupcakeController::class, 'destroy'])->name('cupcake.delete'); // TO TEST -> admin
         Route::post('/cupcake/create', [CupcakeController::class, "store"])->name('cupcake.store'); // TO TEST -> admin

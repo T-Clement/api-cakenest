@@ -27,7 +27,7 @@ class DatabaseSeeder extends Seeder
         $notAdminUser = User::factory()->create([
             'name' => 'Clem',
             'email' => 'test@test.com',
-            'is_admin' => false
+            'is_admin' => true
         ]);
 
         $users = User::factory(10)->create();
@@ -64,6 +64,9 @@ class DatabaseSeeder extends Seeder
         $orders = Order::factory(10)->recycle($users)->create();  // create but not saved immediately
 
         foreach ($orders as $order) {
+
+            $totalPrice = 0;
+
             // assign each order to a random user
             //$randomUser = $users->random();
 
@@ -77,10 +80,29 @@ class DatabaseSeeder extends Seeder
             foreach ($randomCupcakes as $cupcake) {
                 // random quantity between 1 and 5
                 $quantity = mt_rand(1, 5);
-                $totalPrice = $cupcake->price_in_cents * $quantity; // calculate the total price for this cupcake
+                // $totalPrice = $cupcake->price_in_cents * $quantity; // calculate the total price for this cupcake
+                $priceWhenOrdered = $cupcake->price_in_cents;
+
+                // calculate total price for this cupcake
+                $totalPriceForCupcake = $priceWhenOrdered * $quantity;
+
 
                 // insert into the pivot table `order_cupcake`
-                $order->cupcakes()->attach($cupcake->id, ['quantity' => $quantity, 'total_price_in_cents' => $totalPrice, 'current_cupcake_price_when_order' => $cupcake->price_in_cents]);
+                $order->cupcakes()->attach($cupcake->id, [
+                    'quantity' => $quantity,
+                    // 'total_price_in_cents' => $totalPrice,
+                    'current_cupcake_price_when_order' => $priceWhenOrdered
+                ]);
+
+
+                // add to the total price of the order 
+                $totalPrice += $totalPriceForCupcake;
+
+
+                // decrease the stock of the cupcake
+                // $cupcake->decrement('quantity', $quantity);
+
+
 
                 // DB::table('cupcake_order')->insert([
                 //     'order_id' => $order->id, // ensure the correct order is being referenced
@@ -91,6 +113,11 @@ class DatabaseSeeder extends Seeder
                 //     'updated_at' => now(),
                 // ]);
             }
+
+
+            // update the total price of the order
+            $order->update(['total_price_in_cents' => $totalPrice, "status" => "confirmated"]);
+
         }
 
 

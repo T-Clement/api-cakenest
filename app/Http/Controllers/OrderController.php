@@ -26,6 +26,11 @@ class OrderController extends Controller
         }
     }
 
+
+
+
+
+    
     /**
      * Store a newly created resource in storage.
      */
@@ -86,28 +91,39 @@ class OrderController extends Controller
 
         // create new Order ans associate new user
         $order = Order::create([
-            'user_id' => $userId
+            'user_id' => $userId,
+            "status" => "cart",
+            'total_price_in_cents' => 0
         ]);
 
+
+
+        $totalPrice = 0;
 
         // foreach cupcake in order, insert a new row in pivot table cupcake_order
         foreach($validated['cupcakes'] as $orderCupcake) {
             // get cupcake from database
             $cupcake = Cupcake::findOrFail($orderCupcake['cupcake_id']);
 
-            // 
+            // add to pivot table
             $order->cupcakes()->attach($orderCupcake['cupcake_id'], [
                 'quantity' => $orderCupcake['quantity'],
-                'total_price_in_cents' => $cupcake->price_in_cents * $orderCupcake['quantity'], // calculate total_price with price from database and
+                // 'total_price_in_cents' => $cupcake->price_in_cents * $orderCupcake['quantity'], // calculate total_price with price from database and
                 'current_cupcake_price_when_order' => $cupcake->price_in_cents 
             ]);
             
             // lower stock of specific cupcake related to quantity in order for this cupcake
             $cupcake->quantity -= $orderCupcake['quantity'];
             $cupcake->save(); 
+
+            // add to total price of order
+            $totalPrice += $cupcake->price_in_cents * $orderCupcake['quantity'];
             
         }
         
+        // update total of order
+        $order->update(['total_price_in_cents' => $totalPrice]);
+
         // return order with cupcakes
         return response()->json($order->load('cupcakes'), 201);
     }

@@ -7,7 +7,7 @@ Cupcakes :
     Delete : OK
 
 Orders : 
-    Create: OK, substract quantity in order of cupcake quantiy
+    Create: OK, substract quantity in order of cupcake quantiy // NEED A FIX WITH CART STATUS NOW
     Read: OK, a user can only get access to his orders, admin can get access to all orders (show and index)
 
 

@@ -17,7 +17,7 @@ return new class extends Migration
             $table->foreignId('order_id')->constrained();
             $table->integer("quantity");
             $table->integer("current_cupcake_price_when_order");
-            $table->integer("total_price_in_cents");
+            // $table->integer("total_price_in_cents");
             $table->timestamps();
         });
     }

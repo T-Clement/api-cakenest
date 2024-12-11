@@ -14,6 +14,8 @@ return new class extends Migration
         Schema::create('orders', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained();
+            $table->enum("status", ["confirmated", "cart", "cancelled"])->default('cart');
+            $table->integer('total_price_in_cents')->default(0);
             $table->timestamps();
         });
     }
