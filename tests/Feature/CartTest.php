@@ -105,7 +105,7 @@ test('a logged-in user can get his cart his previous / current cart', function (
 
 
 
-test("a logged-in user cannot get the cart of an another user", function() {
+test("a logged-in user cannot get the cart of an another user", function () {
 
 
     $users = User::factory()->count(2)->create();
@@ -113,10 +113,9 @@ test("a logged-in user cannot get the cart of an another user", function() {
     $cart = Cart::factory()->create(["user_id" => $users[0]->id]);
 
     // acting as second user to access to first user cart
-    $response = actingAs($users[1])->getJson(route("cart.show", ["id" =>$users[0]->id]));
+    $response = actingAs($users[1])->getJson(route("cart.show", ["id" => $users[0]->id]));
 
     $response->assertForbidden();
-
 });
 
 
@@ -172,10 +171,10 @@ test("a user can add a cupcake to an non empty cart", function () {
     // create Cart
     $cart = Cart::factory()->create(["user_id" => $user->id]);
     $cart->cupcakes()->attach([
-        $cupcakes[1]->id => ['quantity' => 5], 
+        $cupcakes[1]->id => ['quantity' => 5],
         $cupcakes[4]->id => ['quantity' => 7]
     ]);
-    
+
     $selectedCupcake = $cupcakes[0]->toArray();
 
     // decrementation of quantity is handle in order.store
@@ -187,7 +186,7 @@ test("a user can add a cupcake to an non empty cart", function () {
                     "cupcake_id" => $selectedCupcake['id'],
                     "quantity" => 9
                 ],
-                
+
             ]
         ]
     );
@@ -210,7 +209,7 @@ test("a user can add a cupcake to an non empty cart", function () {
 test("a user can update an empty cart by adding one cupcake", function () {
 
     // create cupcakes
-    $cupcakes = Cupcake::factory()->count(10)->create(["quantity" => 10]);
+    $cupcake = Cupcake::factory()->create(["quantity" => 10]);
 
     // create User
     /** @var User */
@@ -220,16 +219,36 @@ test("a user can update an empty cart by adding one cupcake", function () {
     // create Cart
     $cart = Cart::factory()->create(["user_id" => $user->id]);
 
+    $response = actingAs($user)->patchJson(
+        route("cart.update", ["id" => $user->id]),
+        [
+            "cupcakes" => [
+                [
+                    "cupcake_id" => $cupcake->id,
+                    "quantity" => 9
+                ],
+
+            ]
+        ]
+    );
 
 
+    $response->assertStatus(200);
 
+    $updatedCart = $response->json();
+
+    expect($updatedCart["cupcakes"])->toHaveCount(1)
+        ->and($updatedCart["cupcakes"][0]['id'])->toBe($cupcake->id)
+        ->and($updatedCart['cupcakes'][0]['pivot']['quantity'])->toBe(9);
+
+    // count that there is one cupcake in cupcakes and it's the cupcake id passed in request body and with the correct quantity
 
 
 });
 
 
 
-test("a user can update an the quantity of a cupcake already in cart (increasing)", function () {
+test("a user can update the quantity of a cupcake already in cart (increasing)", function () {
 
     // create cupcakes
     $cupcakes = Cupcake::factory()->count(10)->create(["quantity" => 10]);
@@ -241,16 +260,10 @@ test("a user can update an the quantity of a cupcake already in cart (increasing
 
     // create Cart
     $cart = Cart::factory()->create(["user_id" => $user->id]);
-
-
-
-
-
-
 });
 
 
-test("a user can update an the quantity of a cupcake already in cart (decreasing)", function () {
+test("a user can update the quantity of a cupcake already in cart (decreasing)", function () {
 
     // create cupcakes
     $cupcakes = Cupcake::factory()->count(10)->create(["quantity" => 10]);
@@ -262,32 +275,21 @@ test("a user can update an the quantity of a cupcake already in cart (decreasing
 
     // create Cart
     $cart = Cart::factory()->create(["user_id" => $user->id]);
-
-
-
-
-
-
 });
 
 
-test("a user can delete a cupcake in a cart", function () {
+test("a user can delete a cupcake in a cart", function () {});
+
+test("a user can not add / update a cupcake who has enough stock in cart", function () {});
 
 
 
 
-
-});
-
-
-
-test("a user cannot add to the cart a non existing cupcake", function() {
-
-});
+test("a user cannot add to the cart a non existing cupcake", function () {});
 
 
 
-test("a user cannot update the cart related to someone else", function() {
+test("a user cannot update the cart related to someone else", function () {
 
     // create User
     $user = User::factory()->create();
@@ -300,6 +302,4 @@ test("a user cannot update the cart related to someone else", function() {
 
 
 
-test("admin user can update the cart of a user", function () {
-
-});
+test("admin user can update the cart of a user", function () {});

@@ -53,20 +53,15 @@ class CartController extends Controller
     {
         $userId = $request->user()->id;
 
-        // dd($userId);
-        // dd($request->id);
         if($request->id != $userId) {
             return response("Forbidden", 403);
         }
 
         $cart = Cart::where('user_id', $userId)->first();
 
-        // dd($cart->load("cupcakes")->toArray());
-
         if(!$cart) {
             return response("No cart found", 404);
         }
-
 
         return response()->json($cart->load("cupcakes"), 200);
     }
