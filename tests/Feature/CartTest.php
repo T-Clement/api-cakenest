@@ -468,10 +468,37 @@ test("a user cannot update the cart related to someone else", function () {
     );
 
     $response->assertStatus(403);
-
-
 });
 
 
 
-test("admin user can update the cart of a user", function () {});
+test("admin user can update the cart of a user", function () {
+
+    $adminUser = User::factory()->admin()->create();
+
+    // dd($adminUser);
+
+    $customer = User::factory()->create();
+
+
+    $cupcake = Cupcake::factory()->create();
+
+    $customerCart = Cart::factory()->create(["user_id" => $customer->id]);
+
+
+    $response = actingAs($adminUser)->patchJson(
+        route("cart.update", ["id" => $customer->id]),
+        [
+            "cupcakes" => [
+                [
+                    "cupcake_id" => $cupcake->id,
+                    "quantity" => 3
+                ]
+            ]
+        ]
+    );
+
+    $response->assertStatus(200);
+
+
+});

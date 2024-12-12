@@ -75,13 +75,15 @@ class CartController extends Controller
      */
     public function update(Request $request, Cart $cart)
     {
-
-        // check if user in request is the owner of the cart
+        
+        // id of user making the request
         $userId = $request->user()->id;
-
-        $cart = Cart::where('user_id', $userId)->first();
-
-        if (!$cart || $cart->user_id !== $userId) {
+        
+        // take id of user in params in request and not the id of the user making the request
+        $cart = Cart::where('user_id', $request->id)->first();
+        
+        // check if user in request is the owner of the cart
+        if ((!$cart || $cart->user_id !== $userId) && !$request->user()->is_admin) {
             // dd("in if user not owner of cart");
             return response("Unauthorized", 403);
         }
