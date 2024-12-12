@@ -13,6 +13,10 @@ use function Pest\Laravel\actingAs;
 use function Pest\Laravel\getJson;
 use function Pest\Laravel\postJson;
 
+
+
+// we get the current cart of the user or a new cart 
+// after he logged-in the app
 test('a logged-in user can create a cart', function () {
 
     // create User
@@ -136,7 +140,8 @@ test('an anonymous user can not get a cart', function () {
 
 
 
-// add cupcake (quantity > 0), delete (quantity = 0),
+// add cupcake (quantity > 0), delete (quantity = 0), 
+// no presence of old cupcake in request remove him from the cart
 // update the same cupcake by increasing or descreasing the quantity of one cupcake
 // 
 test("a user can add a cupcake to an non empty cart", function () {
@@ -188,6 +193,84 @@ test("a user can add a cupcake to an non empty cart", function () {
 
 test("a user can update an empty cart by adding one cupcake", function () {
 
+    // create cupcakes
+    $cupcakes = Cupcake::factory()->count(10)->create(["quantity" => 10]);
 
+    // create User
+    /** @var User */
+    $user = User::factory()->create();
+
+
+    // create Cart
+    $cart = Cart::factory()->create(["user_id" => $user->id]);
+
+
+
+
+
+
+});
+
+
+
+test("a user can update an the quantity of a cupcake already in cart (increasing)", function () {
+
+    // create cupcakes
+    $cupcakes = Cupcake::factory()->count(10)->create(["quantity" => 10]);
+
+    // create User
+    /** @var User */
+    $user = User::factory()->create();
+
+
+    // create Cart
+    $cart = Cart::factory()->create(["user_id" => $user->id]);
+
+
+
+
+
+
+});
+
+
+test("a user can update an the quantity of a cupcake already in cart (decreasing)", function () {
+
+    // create cupcakes
+    $cupcakes = Cupcake::factory()->count(10)->create(["quantity" => 10]);
+
+    // create User
+    /** @var User */
+    $user = User::factory()->create();
+
+
+    // create Cart
+    $cart = Cart::factory()->create(["user_id" => $user->id]);
+
+
+
+
+
+
+});
+
+
+test("a user can delete a cupcake in a cart", function () {
+
+
+
+
+
+});
+
+
+
+test("a user cannot add to the cart a non existing cupcake", function() {
+
+});
+
+
+
+test("a user can only update the cart related to himself", function() {
 
 });
