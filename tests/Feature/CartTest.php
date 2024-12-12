@@ -377,19 +377,54 @@ test("a user can delete a cupcake in a cart", function () {
 
 
     $updatedCart = $response->json();
-    expect(count($updatedCart["cupcakes"]))->toBe(0);
+    // no more cupcakes in cart after the cart is empty
+    expect(count($updatedCart["cupcakes"]))->toEqual(0);
+
 });
 
-test("a user can not add / update a cupcake who has enough stock in cart", function () {});
+test("a user can not add / update a cupcake who has enough stock in cart", function () {
+    /** @var User */
+    $user = User::factory()->create();
+
+
+    $cupcake = Cupcake::factory()->create(["quantity" => 5]);
+
+
+    $cart = Cart::factory()->create(["user_id" => $user->id]);
+
+    $response = actingAs($user)->patchJson(
+        route('cart.update', ["id" => $user->id]),
+        // data
+        [
+            "cupcakes" => [
+                [
+                    "cupcake_id" => $cupcake->id,
+                    "quantity" => 10
+                ]
+            ]
+        ]
+    );
+
+
+    $response->assertStatus(400);
+
+    // $response->dump();
+
+
+});
 
 
 
 
-test("a user cannot add to the cart a non existing cupcake", function () {});
+test("a user cannot add to the cart a non existing cupcake", function () {
+
+});
 
 
 
-test("a user cannot update the cart related to someone else", function () {
+test("a user cannot update the cart related to someone else", function (
+
+) {
 
     // create User
     $user = User::factory()->create();
@@ -402,4 +437,6 @@ test("a user cannot update the cart related to someone else", function () {
 
 
 
-test("admin user can update the cart of a user", function () {});
+test("admin user can update the cart of a user", function () {
+
+});
