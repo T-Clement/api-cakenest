@@ -82,7 +82,7 @@ class CartController extends Controller
         $cart = Cart::where('user_id', $userId)->first();
 
         if (!$cart || $cart->user_id !== $userId) {
-            dd("in if user not owner of cart");
+            // dd("in if user not owner of cart");
             return response("Unauthorized", 403);
         }
 
