@@ -237,11 +237,11 @@ test("a user can update an empty cart by adding one cupcake", function () {
 
     $updatedCart = $response->json();
 
+    // count that there is one cupcake in cupcakes and it's the cupcake id passed in request body and with the correct quantity
     expect($updatedCart["cupcakes"])->toHaveCount(1)
         ->and($updatedCart["cupcakes"][0]['id'])->toBe($cupcake->id)
         ->and($updatedCart['cupcakes'][0]['pivot']['quantity'])->toBe(9);
 
-    // count that there is one cupcake in cupcakes and it's the cupcake id passed in request body and with the correct quantity
 
 
 });
@@ -251,7 +251,7 @@ test("a user can update an empty cart by adding one cupcake", function () {
 test("a user can update the quantity of a cupcake already in cart (increasing)", function () {
 
     // create cupcakes
-    $cupcakes = Cupcake::factory()->count(10)->create(["quantity" => 10]);
+    $cupcake = Cupcake::factory()->create(["quantity" => 10]);
 
     // create User
     /** @var User */
@@ -260,13 +260,45 @@ test("a user can update the quantity of a cupcake already in cart (increasing)",
 
     // create Cart
     $cart = Cart::factory()->create(["user_id" => $user->id]);
+
+    // add cupcake to cart
+    $cart->cupcakes()->attach([
+        $cupcake->id => ['quantity' => 5],
+    ]);
+
+
+
+    $response = actingAs($user)->patchJson(
+        route("cart.update", ["id" => $user->id]),
+        [
+            "cupcakes" => [
+                [
+                    "cupcake_id" => $cupcake->id,
+                    "quantity" => 9
+                ],
+
+            ]
+        ]
+    );
+
+    $response->assertStatus(200);
+
+
+    $updatedCart = $response->json();
+    expect($updatedCart["cupcakes"][0]['id'])->toBe($cupcake->id)
+        ->and($updatedCart['cupcakes'][0]['pivot']['quantity'])->toBe(9);
+
+
+
+
+
 });
 
 
 test("a user can update the quantity of a cupcake already in cart (decreasing)", function () {
 
     // create cupcakes
-    $cupcakes = Cupcake::factory()->count(10)->create(["quantity" => 10]);
+    $cupcake = Cupcake::factory()->create(["quantity" => 10]);
 
     // create User
     /** @var User */
@@ -275,10 +307,78 @@ test("a user can update the quantity of a cupcake already in cart (decreasing)",
 
     // create Cart
     $cart = Cart::factory()->create(["user_id" => $user->id]);
+
+
+    // add cupcake to cart
+    $cart->cupcakes()->attach([
+        $cupcake->id => ['quantity' => 10],
+    ]);
+
+
+
+    $response = actingAs($user)->patchJson(
+        route("cart.update", ["id" => $user->id]),
+        [
+            "cupcakes" => [
+                [
+                    "cupcake_id" => $cupcake->id,
+                    "quantity" => 9
+                ],
+
+            ]
+        ]
+    );
+
+    $response->assertStatus(200);
+
+
+    $updatedCart = $response->json();
+    expect($updatedCart["cupcakes"][0]['id'])->toBe($cupcake->id)
+        ->and($updatedCart['cupcakes'][0]['pivot']['quantity'])->toBe(9);
+
+
 });
 
 
-test("a user can delete a cupcake in a cart", function () {});
+test("a user can delete a cupcake in a cart", function () {
+    // create cupcakes
+    $cupcake = Cupcake::factory()->create(["quantity" => 10]);
+
+    // create User
+    /** @var User */
+    $user = User::factory()->create();
+
+
+    // create Cart
+    $cart = Cart::factory()->create(["user_id" => $user->id]);
+
+
+    // add cupcake to cart
+    $cart->cupcakes()->attach([
+        $cupcake->id => ['quantity' => 10],
+    ]);
+
+
+
+    $response = actingAs($user)->patchJson(
+        route("cart.update", ["id" => $user->id]),
+        [
+            "cupcakes" => [
+                [
+                    "cupcake_id" => $cupcake->id,
+                    "quantity" => 0
+                ],
+
+            ]
+        ]
+    );
+
+    $response->assertStatus(200);
+
+
+    $updatedCart = $response->json();
+    expect(count($updatedCart["cupcakes"]))->toBe(0);
+});
 
 test("a user can not add / update a cupcake who has enough stock in cart", function () {});
 
