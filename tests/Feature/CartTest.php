@@ -105,6 +105,22 @@ test('a logged-in user can get his cart his previous / current cart', function (
 
 
 
+test("a logged-in user cannot get the cart of an another user", function() {
+
+
+    $users = User::factory()->count(2)->create();
+
+    $cart = Cart::factory()->create(["user_id" => $users[0]->id]);
+
+    // acting as second user to access to first user cart
+    $response = actingAs($users[1])->getJson(route("cart.show", ["id" =>$users[0]->id]));
+
+    $response->assertForbidden();
+
+});
+
+
+
 
 
 
@@ -271,6 +287,19 @@ test("a user cannot add to the cart a non existing cupcake", function() {
 
 
 
-test("a user can only update the cart related to himself", function() {
+test("a user cannot update the cart related to someone else", function() {
+
+    // create User
+    $user = User::factory()->create();
+
+    // created
+
+
+
+});
+
+
+
+test("admin user can update the cart of a user", function () {
 
 });
