@@ -418,6 +418,31 @@ test("a user can not add / update a cupcake who has enough stock in cart", funct
 
 test("a user cannot add to the cart a non existing cupcake", function () {
 
+    /** @var User */
+    $user = User::factory()->create();
+    
+    $cart = Cart::factory()->create(["user_id" => $user->id]);
+
+
+    $response = actingAs($user)->patchJson(
+        route('cart.update', ["id" => $user->id]),
+        // data
+        [
+            "cupcakes" => [
+                [
+                    "cupcake_id" => 5,
+                    "quantity" => 10
+                ]
+            ]
+        ]
+    );
+
+
+    $response->assertStatus(422);
+
+    // dd($response);
+
+
 });
 
 
