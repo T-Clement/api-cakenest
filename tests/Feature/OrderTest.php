@@ -14,7 +14,6 @@
 
 // store order of a customer cannot be triggered by another user 
 
-// stock of cupcakes is decrementing related to the value of cupcake passed in order
 
 
 
@@ -33,13 +32,13 @@
 
 
 
-
-
 // discount code
 // ------------------------------------------------------
 // discount cannot make a negative or equals to 0 total
 
 // admin only can create a discount
+
+// check values of date of discount code (expires_at < begin_at) (values in request)
 
 
 
@@ -251,18 +250,89 @@ test("a customer can create an order with a discount code with correct discount 
 
     $response->assertJsonPath('total_final', $expectedFinalTotal);
 
+});
 
-    // 
 
 
-    // check amounts 
-    // total
-    // discount amount
-    // code applied on order
+test("stock of cupcakes is decrementing related to the value of cupcake passed in order", function () {
+
+    // create a user
+    /** @var User */
+    $customer = User::factory()->create();
+
+    // cupcake
+
+    $stockOfCupcake = 10;
+
+    $cupcake = Cupcake::factory()->create([
+        "quantity" => $stockOfCupcake
+    ]);
+
+
+    // create a cart
+    $cart = Cart::factory()->create(["user_id" => $customer->id]);
+
+    // quantity 
+    $cupcakeQuantityOrdered = 3;
+
+    // add cupcake to cart, (add data to pivot table)
+    $cart->cupcakes()->attach([
+        $cupcake->id => ["quantity" => $cupcakeQuantityOrdered],
+    ]);
+    
+    
+    $cartId = $cart->id;
+    
+
+    $discountValue = 10;
+
+    // create discount code
+    $discount = DiscountCode::factory()->create([
+        "code" => "WINTER10",
+        "discount_type" => "percentage",
+        "discount_value" => $discountValue,
+        "is_active" => true,
+        "begin_at" => now()
+    ]);
+
+
+    // expected 
+    $expectedRemainingQuantity = $stockOfCupcake - $cupcakeQuantityOrdered;
+
+    // total expected before discount
+    // $totalBeforeDiscount = ($cupcake->price_in_cents * $cupcakeQuantityOrdered);
+
+    // expected discount amount
+    // $expectedDiscount = $totalBeforeDiscount - (int) ($totalBeforeDiscount * (100 - $discountValue) / 100);
+    // expected final total after discount is added
+    // $expectedFinalTotal = $totalBeforeDiscount - $expectedDiscount;
+    
+    // dd(["expectedDiscount" =>$expectedDiscount, "totalBeforeDiscount" => $totalBeforeDiscount, "expectedFinalTotal" => $expectedFinalTotal]);
+
+    $response = actingAs($customer)->postJson(
+        route('order.store', ['id' => $customer->id]),
+        [
+            "user_id" => $customer->id,
+            "cart_id" => $cartId,
+            "discount_code" => $discount->code,
+            "cupcakes" => [
+                [
+                    "cupcake_id" => $cupcake->id,
+                    "quantity" => $cupcakeQuantityOrdered
+                ]
+            ]
+        ]
+    );
+
+
+    $response->assertStatus(201);
+
+
+    // add a request to check if the stock of cupcake is the same as the new expected one
+
+    $quantityRemaining = Cupcake::find($cupcake->id)->quantity;
+    expect($expectedRemainingQuantity)->toEqual($quantityRemaining);
 
 
 
 });
-
-
-test("", function () {});

@@ -159,8 +159,8 @@ class OrderController extends Controller
 
         // update values of order
         $order->total_whithout_discount = $total_without_discount;
-        $order->discount_code_applied = $discount->code;
-        $order->discount_applied_in_cents = $discount_amount;
+        $order->discount_code_applied = $discount->code ?? null;
+        $order->discount_applied_in_cents = $discount_amount ?? 0;
         $order->total_final = $finalTotal;
 
         $order->save();
