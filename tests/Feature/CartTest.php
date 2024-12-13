@@ -17,7 +17,7 @@ use function Pest\Laravel\postJson;
 
 // we get the current cart of the user or a new cart 
 // after he logged-in the app
-test('a logged-in user can create a cart', function () {
+test("a logged-in user can create a cart", function () {
 
     // create User
     /** @var User */
@@ -37,7 +37,7 @@ test('a logged-in user can create a cart', function () {
 
 
 
-test('an anonymous user cannot create a cart', function () {
+test("an anonymous user cannot create a cart", function () {
 
 
     // create Cart
@@ -52,7 +52,7 @@ test('an anonymous user cannot create a cart', function () {
 
 
 
-test('a logged-in user can get his cart his previous / current cart', function () {
+test("a logged-in user can get his cart his previous / current cart", function () {
 
     // create User
     /** @var User */
@@ -123,7 +123,7 @@ test("a logged-in user cannot get the cart of an another user", function () {
 
 
 
-test('an anonymous user can not get a cart', function () {
+test("an anonymous user can not get a cart", function () {
 
     // create cupcakes
     $cupcakes = Cupcake::factory()->count(10)->create(["quantity" => 10]);
@@ -245,7 +245,7 @@ test("a user can update an empty cart by adding one cupcake", function () {
 
 
 
-test("a user can update the quantity of a cupcake already in cart (increasing)", function () {
+test("a user can update the quantity of a cupcake already in cart -- increasing", function () {
 
     // create cupcakes
     $cupcake = Cupcake::factory()->create(["quantity" => 10]);
@@ -287,7 +287,7 @@ test("a user can update the quantity of a cupcake already in cart (increasing)",
 });
 
 
-test("a user can update the quantity of a cupcake already in cart (decreasing)", function () {
+test("a user can update the quantity of a cupcake already in cart -- decreasing", function () {
 
     // create cupcakes
     $cupcake = Cupcake::factory()->create(["quantity" => 10]);

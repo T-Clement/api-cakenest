@@ -1,8 +1,7 @@
 <?php
 
 // STORE
-
-
+// -------------------------------------------------------
 // order with discount code as percentage
 
 // order with discount code as fix amount
@@ -13,7 +12,7 @@
 
 // order with an invalid / not existing discount code
 
-// order of a customer cannot be triggered by another user 
+// store order of a customer cannot be triggered by another user 
 
 // stock of cupcakes is decrementing related to the value of cupcake passed in order
 
@@ -22,7 +21,7 @@
 
 
 // SHOW 
-
+// -------------------------------------------------------
 // show order with discount code applied
 
 // show order without discount code
@@ -31,16 +30,17 @@
 
 // show order of another user (non-admin)
 
-// 
+
+
+
 
 
 // discount code
-
+// ------------------------------------------------------
 // discount cannot make a negative or equals to 0 total
 
 // admin only can create a discount
 
-// 
 
 
 
@@ -55,16 +55,12 @@ use App\Models\User;
 use function Pest\Laravel\actingAs;
 use function Pest\Laravel\postJson;
 
-test('example', function () {
-    
-    
-    
-});
+test('example', function () {});
 
 
 // an anonymous user can not make an order
 test('an anonymous user can not make an order', function () {
-    
+
     // create a user
     $customer = User::factory()->create();
 
@@ -105,7 +101,7 @@ test('an anonymous user can not make an order', function () {
                 [
                     "cupcake_id" => $firstCupcake->id,
                     "quantity" => $cupcakeQuantityOrdered
-                ], 
+                ],
                 [
                     "cupcake_id" => $secondCupcake->id,
                     "quantity" => $cupcakeQuantityOrdered
@@ -113,14 +109,14 @@ test('an anonymous user can not make an order', function () {
             ]
         ]
     );
+
     // 401 handled in auth:sanctum middleware
     $response->assertStatus(401);
-     
 });
 
 
 
-test("a customer can create an order without discount code", function() {
+test("a customer can create an order without discount code", function () {
     // create a user
     /** @var User */
     $customer = User::factory()->create();
@@ -159,7 +155,7 @@ test("a customer can create an order without discount code", function() {
                 [
                     "cupcake_id" => $firstCupcake->id,
                     "quantity" => $cupcakeQuantityOrdered
-                ], 
+                ],
                 [
                     "cupcake_id" => $secondCupcake->id,
                     "quantity" => $cupcakeQuantityOrdered
@@ -174,7 +170,7 @@ test("a customer can create an order without discount code", function() {
 
 
 
-test("a customer can create an order with a discount code with correct discount added", function() {
+test("a customer can create an order with a discount code with correct discount added", function () {
 
 
     // create a user
@@ -194,27 +190,40 @@ test("a customer can create an order with a discount code with correct discount 
     // create a cart
     $cart = Cart::factory()->create(["user_id" => $customer->id]);
 
+    // quantity 
     $cupcakeQuantityOrdered = 3;
-
 
     // add cupcake to cart, (add data to pivot table)
     $cart->cupcakes()->attach([
         $firstCupcake->id => ["quantity" => $cupcakeQuantityOrdered],
         $secondCupcake->id => ["quantity" => $cupcakeQuantityOrdered]
     ]);
-
-
+    
+    
     $cartId = $cart->id;
+    
+
+    $discountValue = 10;
 
     // create discount code
     $discount = DiscountCode::factory()->create([
         "code" => "WINTER10",
         "discount_type" => "percentage",
-        "discount_value" => 10,
+        "discount_value" => $discountValue,
         "is_active" => true,
         "begin_at" => now()
     ]);
 
+    // total expected before discount
+    $totalBeforeDiscount = ($firstCupcake->price_in_cents * $cupcakeQuantityOrdered)
+        + ($secondCupcake->price_in_cents * $cupcakeQuantityOrdered);
+
+    // expected discount amount
+    $expectedDiscount = $totalBeforeDiscount - (int) ($totalBeforeDiscount * (100 - $discountValue) / 100);
+    // expected final total after discount is added
+    $expectedFinalTotal = $totalBeforeDiscount - $expectedDiscount;
+    
+    // dd(["expectedDiscount" =>$expectedDiscount, "totalBeforeDiscount" => $totalBeforeDiscount, "expectedFinalTotal" => $expectedFinalTotal]);
 
     $response = actingAs($customer)->postJson(
         route('order.store', ['id' => $customer->id]),
@@ -226,7 +235,7 @@ test("a customer can create an order with a discount code with correct discount 
                 [
                     "cupcake_id" => $firstCupcake->id,
                     "quantity" => $cupcakeQuantityOrdered
-                ], 
+                ],
                 [
                     "cupcake_id" => $secondCupcake->id,
                     "quantity" => $cupcakeQuantityOrdered
@@ -235,14 +244,25 @@ test("a customer can create an order with a discount code with correct discount 
         ]
     );
 
-    dd($response->json());
-    $response->assertStatus(201);
+
+    $response->assertStatus(201)
+             ->assertJsonPath('discount_code_applied', $discount->code)
+             ->assertJsonPath('discount_applied_in_cents', $expectedDiscount);
+
+    $response->assertJsonPath('total_final', $expectedFinalTotal);
+
+
+    // 
+
 
     // check amounts 
-        // total
-        // discount amount
-        // code applied on order
+    // total
+    // discount amount
+    // code applied on order
 
 
 
 });
+
+
+test("", function () {});

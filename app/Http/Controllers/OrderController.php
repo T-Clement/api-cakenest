@@ -36,7 +36,7 @@ class OrderController extends Controller
     public function store(Request $request)
     {
         
-        
+
 
 
 
@@ -157,7 +157,7 @@ class OrderController extends Controller
 
         $finalTotal = $total_without_discount - $discount_amount;
 
-        
+        // update values of order
         $order->total_whithout_discount = $total_without_discount;
         $order->discount_code_applied = $discount->code;
         $order->discount_applied_in_cents = $discount_amount;
@@ -170,6 +170,8 @@ class OrderController extends Controller
     }
 
 
+
+    
     /**
      * Display the specified resource.
      */
