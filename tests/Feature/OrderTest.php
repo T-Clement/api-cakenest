@@ -12,7 +12,6 @@
 
 // order with an invalid / not existing discount code
 
-// store order of a customer cannot be triggered by another user 
 
 
 
@@ -374,5 +373,57 @@ test("customer cannot make an order with an expired discount code", function() {
     );
 
     $response->assertStatus(400);
+
+});
+
+
+
+test("store order of a customer cannot be triggered by another user", function () {
+
+
+    $users = User::factory()->count(2)->create();
+
+    $firstUser = $users[0];
+    $secondUser = $users[1];
+
+    // cupcake
+
+    $stockOfCupcake = 10;
+
+    $cupcake = Cupcake::factory()->create([
+        "quantity" => $stockOfCupcake
+    ]);
+
+
+    // create a cart
+    $cart = Cart::factory()->create(["user_id" => $firstUser->id]);
+
+    // quantity 
+    $cupcakeQuantityOrdered = 3;
+
+    // add cupcake to cart, (add data to pivot table)
+    $cart->cupcakes()->attach([
+        $cupcake->id => ["quantity" => $cupcakeQuantityOrdered],
+    ]);
+    
+    
+
+    $response = actingAs($secondUser)->postJson(
+        route('order.store', ['id' => $firstUser->id]),
+        [
+            "user_id" => $firstUser->id,
+            "cart_id" => $cart->id,
+            "cupcakes" => [
+                [
+                    "cupcake_id" => $cupcake->id,
+                    "quantity" => $cupcakeQuantityOrdered
+                ]
+            ]
+        ]
+    );
+
+    $response->assertForbidden();
+
+
 
 });
