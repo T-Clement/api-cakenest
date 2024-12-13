@@ -13,6 +13,11 @@
 
 // order with an invalid / not existing discount code
 
+// order of a customer cannot be triggered by another user 
+
+// stock of cupcakes is decrementing related to the value of cupcake passed in order
+
+
 
 
 
@@ -43,6 +48,7 @@
 
 use App\Models\Cart;
 use App\Models\Cupcake;
+use App\Models\DiscountCode;
 use App\Models\Order;
 use App\Models\User;
 
@@ -107,31 +113,9 @@ test('an anonymous user can not make an order', function () {
             ]
         ]
     );
-    // handled in middleware
+    // 401 handled in auth:sanctum middleware
     $response->assertStatus(401);
      
-    // dd($cartId);
-
-
-    // add pivot data to pivot table
-        // add cupcake to order with a specific quantity of one cupcake
-
-        // attach can take an array of IDs
-    // $cart->cupcakes()->attach($cupcake->id, [
-    //     'quantity' => $cupcakeQuantityOrdered,
-    //     'total_price_in_cents' => $cupcake->price_in_cents * $cupcakeQuantityOrdered, // calculate total_price with price from database and
-    //     'current_cupcake_price_when_order' => $cupcake->price_in_cents 
-    // ]);
-
-    // // dd($order->cupcakes()->user()->get());
-
-    // dd(Order::with(["cupcakes", "user"])->get()->toArray());
-
-
-
-
-
-
 });
 
 
@@ -163,8 +147,6 @@ test("a customer can create an order without discount code", function() {
         $secondCupcake->id => ["quantity" => $cupcakeQuantityOrdered]
     ]);
 
-    // dd($cart->with("cupcakes")->get()->toArray());
-
 
     $cartId = $cart->id;
 
@@ -186,18 +168,81 @@ test("a customer can create an order without discount code", function() {
         ]
     );
 
-    // dd($response->json());
     $response->assertStatus(201);
-
-
 });
 
 
 
 
-test("", function() {
+test("a customer can create an order with a discount code with correct discount added", function() {
 
-    
+
+    // create a user
+    /** @var User */
+    $customer = User::factory()->create();
+
+
+    // cupcake
+    $cupcakes = Cupcake::factory()->count(2)->create([
+        "quantity" => 10
+    ]);
+
+
+    $firstCupcake = $cupcakes[0];
+    $secondCupcake = $cupcakes[1];
+
+    // create a cart
+    $cart = Cart::factory()->create(["user_id" => $customer->id]);
+
+    $cupcakeQuantityOrdered = 3;
+
+
+    // add cupcake to cart, (add data to pivot table)
+    $cart->cupcakes()->attach([
+        $firstCupcake->id => ["quantity" => $cupcakeQuantityOrdered],
+        $secondCupcake->id => ["quantity" => $cupcakeQuantityOrdered]
+    ]);
+
+
+    $cartId = $cart->id;
+
+    // create discount code
+    $discount = DiscountCode::factory()->create([
+        "code" => "WINTER10",
+        "discount_type" => "percentage",
+        "discount_value" => 10,
+        "is_active" => true,
+        "begin_at" => now()
+    ]);
+
+
+    $response = actingAs($customer)->postJson(
+        route('order.store', ['id' => $customer->id]),
+        [
+            "user_id" => $customer->id,
+            "cart_id" => $cartId,
+            "discount_code" => $discount->code,
+            "cupcakes" => [
+                [
+                    "cupcake_id" => $firstCupcake->id,
+                    "quantity" => $cupcakeQuantityOrdered
+                ], 
+                [
+                    "cupcake_id" => $secondCupcake->id,
+                    "quantity" => $cupcakeQuantityOrdered
+                ]
+            ]
+        ]
+    );
+
+    dd($response->json());
+    $response->assertStatus(201);
+
+    // check amounts 
+        // total
+        // discount amount
+        // code applied on order
+
 
 
 });

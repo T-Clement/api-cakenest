@@ -27,6 +27,9 @@ class OrderController extends Controller
         }
     }
 
+
+
+
     /**
      * Store a newly created resource in storage.
      */
@@ -34,6 +37,9 @@ class OrderController extends Controller
     {
         
         
+
+
+
         // validate data
         $validated = $request->validate([
             'user_id' => 'required|exists:users,id',
@@ -72,8 +78,6 @@ class OrderController extends Controller
             
         }
 
-
-
         $user = $request->user();
 
         // case order from admin page, where admin select an id and create odrer for this specific user
@@ -90,13 +94,12 @@ class OrderController extends Controller
 
         // create new Order ans associate new user
         $order = Order::create([
-            'user_id' => $userId
+            'user_id' => $userId,
         ]);
 
 
-        $total = 0;
-
-
+        // total of order
+        $total_without_discount = 0;
 
         // foreach cupcake in order, insert a new row in pivot table cupcake_order
         foreach($validated['cupcakes'] as $orderCupcake) {
@@ -114,11 +117,17 @@ class OrderController extends Controller
             $cupcake->quantity -= $orderCupcake['quantity'];
             $cupcake->save(); 
             
+
+            // incremente total
+            $total_without_discount += $cupcake->price_in_cents * $orderCupcake['quantity'];
+
+
         }
-        
 
 
-        $discount = 0;
+
+        // DISCOUNT
+        $discount_amount = 0;
 
         if(!empty($validated['discount_code'])) {
             $discount = DiscountCode::where('code', $validated["discount_code"])
@@ -130,20 +139,31 @@ class OrderController extends Controller
                 ->first();
 
 
-            if($discount) {
-                //percentage
+            if( $discount ) {
+                if( $discount->discount_type === "percentage" ) {
 
+                    // calculate discount amount from $total
+                    $discount_amount = $total_without_discount - (int) floor($total_without_discount * (100 - $discount->discount_value) / 100);
+                
+                } else if ( $discount->discount_type === "fixed" ) {
+                    // to add if time .. 
+                }
 
-                // else
-
-
+            } else {
+                return response("Disount code not found.", 404);
             }
         }
+        
 
-        //$finalTotal = $total - $discount;
-
+        $finalTotal = $total_without_discount - $discount_amount;
 
         
+        $order->total_whithout_discount = $total_without_discount;
+        $order->discount_code_applied = $discount->code;
+        $order->discount_applied_in_cents = $discount_amount;
+        $order->total_final = $finalTotal;
+
+        $order->save();
 
         // return order with cupcakes
         return response()->json($order->load('cupcakes'), 201);

@@ -12,8 +12,10 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('orders', function (Blueprint $table) {
+            $table->integer('total_whithout_discount')->default(0);
             $table->string('discount_code_applied')->nullable();
             $table->integer('discount_applied_in_cents')->default(0);
+            $table->integer('total_final')->default(0);
         });
     }
 
