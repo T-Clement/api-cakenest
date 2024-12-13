@@ -296,18 +296,9 @@ test("stock of cupcakes is decrementing related to the value of cupcake passed i
     ]);
 
 
-    // expected 
+    // expected quantity remaining
     $expectedRemainingQuantity = $stockOfCupcake - $cupcakeQuantityOrdered;
 
-    // total expected before discount
-    // $totalBeforeDiscount = ($cupcake->price_in_cents * $cupcakeQuantityOrdered);
-
-    // expected discount amount
-    // $expectedDiscount = $totalBeforeDiscount - (int) ($totalBeforeDiscount * (100 - $discountValue) / 100);
-    // expected final total after discount is added
-    // $expectedFinalTotal = $totalBeforeDiscount - $expectedDiscount;
-    
-    // dd(["expectedDiscount" =>$expectedDiscount, "totalBeforeDiscount" => $totalBeforeDiscount, "expectedFinalTotal" => $expectedFinalTotal]);
 
     $response = actingAs($customer)->postJson(
         route('order.store', ['id' => $customer->id]),
@@ -329,10 +320,13 @@ test("stock of cupcakes is decrementing related to the value of cupcake passed i
 
 
     // add a request to check if the stock of cupcake is the same as the new expected one
-
     $quantityRemaining = Cupcake::find($cupcake->id)->quantity;
     expect($expectedRemainingQuantity)->toEqual($quantityRemaining);
 
+});
 
 
+
+test("", function() {
+    
 });
