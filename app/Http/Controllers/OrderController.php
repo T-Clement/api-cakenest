@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Cupcake;
+use App\Models\DiscountCode;
 use App\Models\Order;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -31,12 +32,15 @@ class OrderController extends Controller
      */
     public function store(Request $request)
     {
+        
+        
         // validate data
         $validated = $request->validate([
             'user_id' => 'required|exists:users,id',
             'cupcakes' => 'required|array',
             'cupcakes.*.cupcake_id' => 'required|exists:cupcakes,id',
-            'cupcakes.*.quantity' => 'required|integer|min:1'
+            'cupcakes.*.quantity' => 'required|integer|min:1',
+            'discount_code' => 'nullable|string'
         ]);
 
         // array to return to user if stock for a specific cupcake is not available
@@ -90,6 +94,10 @@ class OrderController extends Controller
         ]);
 
 
+        $total = 0;
+
+
+
         // foreach cupcake in order, insert a new row in pivot table cupcake_order
         foreach($validated['cupcakes'] as $orderCupcake) {
             // get cupcake from database
@@ -108,6 +116,35 @@ class OrderController extends Controller
             
         }
         
+
+
+        $discount = 0;
+
+        if(!empty($validated['discount_code'])) {
+            $discount = DiscountCode::where('code', $validated["discount_code"])
+                ->where('is_active', true)
+                ->where(function($q) {
+                    $q->whereNull('expires_at')
+                      ->orWhere('expires_at', '>', now());
+                })
+                ->first();
+
+
+            if($discount) {
+                //percentage
+
+
+                // else
+
+
+            }
+        }
+
+        //$finalTotal = $total - $discount;
+
+
+        
+
         // return order with cupcakes
         return response()->json($order->load('cupcakes'), 201);
     }

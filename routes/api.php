@@ -17,22 +17,23 @@ Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
 
 
 Route::group(['middleware' => ['auth:sanctum']], function () {
+    
+    // CUPCAKE
     Route::get('/cupcake/{id}', [CupcakeController::class, 'show'])->name('cupcake.show');
     Route::get('/cupcake', [CupcakeController::class, 'index'])->name('cupcake.index');
-    Route::get('/order', [OrderController::class, 'index'])->name('order.index');
-    Route::get('/order/{id}', [OrderController::class, 'show'])->name('order.show'); // TO TEST -> not connected
-    Route::post('/order', [OrderController::class, 'store'])->name('order.store'); // TO TEST -> not connected
     
     Route::get("/category/{id}", [CategoryController::class, 'show'])->name("category.show");
-    
 
+    // CART
     Route::post("/cart", [CartController::class, 'store'])->name("cart.store");
-    
     Route::get('/user/{id}/cart', [CartController::class, "show"])->name("cart.show");
-
     Route::patch('/user/{id}/cart', [CartController::class, "update"])->name("cart.update");
-
-
+    
+    // ORDER
+    Route::get('/order', [OrderController::class, 'index'])->name('order.index');
+    Route::get('/order/{id}', [OrderController::class, 'show'])->name('order.show'); // TO TEST -> not connected
+    
+    Route::post('/user/{id}/cart', [OrderController::class, 'store'])->name('order.store'); // TO TEST -> not connected
     
     // isAdmin routes
     Route::group(['middleware' => isAdmin::class], function() {
