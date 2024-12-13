@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Cart;
 use App\Models\Cupcake;
 use App\Models\DiscountCode;
 use App\Models\Order;
@@ -43,6 +44,7 @@ class OrderController extends Controller
         // validate data
         $validated = $request->validate([
             'user_id' => 'required|exists:users,id',
+            'cart_id' => 'required|exists:carts,id',
             'cupcakes' => 'required|array',
             'cupcakes.*.cupcake_id' => 'required|exists:cupcakes,id',
             'cupcakes.*.quantity' => 'required|integer|min:1',
@@ -143,7 +145,7 @@ class OrderController extends Controller
                 if( $discount->discount_type === "percentage" ) {
 
                     // calculate discount amount from $total
-                    $discount_amount = $total_without_discount - (int) round($total_without_discount * (100 - $discount->discount_value) / 100);
+                    $discount_amount = $total_without_discount - (int) floor($total_without_discount * (100 - $discount->discount_value) / 100);
                 
                 } else if ( $discount->discount_type === "fixed" ) {
                     // to add if time .. 
@@ -164,6 +166,13 @@ class OrderController extends Controller
         $order->total_final = $finalTotal;
 
         $order->save();
+
+
+        // delete cart and cupcakes related to him
+        $cart = Cart::find($validated["cart_id"]);
+        $cart->cupcakes()->detach();
+        $cart->delete();
+
 
         // return order with cupcakes
         return response()->json($order->load('cupcakes'), 201);

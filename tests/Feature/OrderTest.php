@@ -27,7 +27,7 @@
 
 // show order of another user (admin)
 
-// show order of another user (non-admin)
+// cant show order of another user (non-admin)
 
 
 
