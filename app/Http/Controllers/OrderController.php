@@ -143,14 +143,14 @@ class OrderController extends Controller
                 if( $discount->discount_type === "percentage" ) {
 
                     // calculate discount amount from $total
-                    $discount_amount = $total_without_discount - (int) floor($total_without_discount * (100 - $discount->discount_value) / 100);
+                    $discount_amount = $total_without_discount - (int) round($total_without_discount * (100 - $discount->discount_value) / 100);
                 
                 } else if ( $discount->discount_type === "fixed" ) {
                     // to add if time .. 
                 }
 
             } else {
-                return response("Disount code not found.", 404);
+                return response("Disount code not found or is expired.", 400);
             }
         }
         

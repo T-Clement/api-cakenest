@@ -54,7 +54,6 @@ use App\Models\User;
 use function Pest\Laravel\actingAs;
 use function Pest\Laravel\postJson;
 
-test('example', function () {});
 
 
 // an anonymous user can not make an order
@@ -327,6 +326,53 @@ test("stock of cupcakes is decrementing related to the value of cupcake passed i
 
 
 
-test("", function() {
+test("customer cannot make an order with an expired discount code", function() {
+
+    // create discount code
+    $discount = DiscountCode::factory()->percentage(10)->expired()->create(["code" => "WINTER10"]);
+
+
+    // create a user
+    /** @var User */
+    $customer = User::factory()->create();
+
+    // cupcake
+
+    $stockOfCupcake = 10;
+
+    $cupcake = Cupcake::factory()->create([
+        "quantity" => $stockOfCupcake
+    ]);
+
+
+    // create a cart
+    $cart = Cart::factory()->create(["user_id" => $customer->id]);
+
+    // quantity 
+    $cupcakeQuantityOrdered = 3;
+
+    // add cupcake to cart, (add data to pivot table)
+    $cart->cupcakes()->attach([
+        $cupcake->id => ["quantity" => $cupcakeQuantityOrdered],
+    ]);
     
+    
+
+    $response = actingAs($customer)->postJson(
+        route('order.store', ['id' => $customer->id]),
+        [
+            "user_id" => $customer->id,
+            "cart_id" => $cart->id,
+            "discount_code" => $discount->code,
+            "cupcakes" => [
+                [
+                    "cupcake_id" => $cupcake->id,
+                    "quantity" => $cupcakeQuantityOrdered
+                ]
+            ]
+        ]
+    );
+
+    $response->assertStatus(400);
+
 });
