@@ -12,28 +12,20 @@ class Cart extends Model
     /** @use HasFactory<\Database\Factories\CartFactory> */
     use HasFactory;
 
-
     /**
      * The attributes that are mass assignable.
      *
      * @var array<int, string>
      */
     protected $fillable = [
-        'total',
-        "user_id",
+        'total', "user_id",
     ];
 
-
-    public function user() :BelongsTo 
-    {
+    public function user() :BelongsTo {
         return $this->belongsTo(User::class);
     }
 
-
-    public function cupcakes() :BelongsToMany 
-    {
+    public function cupcakes() :BelongsToMany {
         return $this->belongsToMany(Cupcake::class)->withPivot("quantity");
     }
-
-
 }

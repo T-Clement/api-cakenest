@@ -81,10 +81,10 @@ class CartController extends Controller
         
         // take id of user in params in request and not the id of the user making the request
         $cart = Cart::where('user_id', $request->id)->first();
-        
+
+
         // check if user in request is the owner of the cart
         if ((!$cart || $cart->user_id !== $userId) && !$request->user()->is_admin) {
-            // dd("in if user not owner of cart");
             return response("Unauthorized", 403);
         }
 
@@ -133,7 +133,6 @@ class CartController extends Controller
 
                         // NOT ENOUGH CUPCAKES IN STOCK
                         // return the data about the stock of this cupcake not beeing enough 
-
                         $outOfStockCupcakes[] = [
                             'id' => $cupcake->id,
                             'name' => $cupcake->name,
@@ -191,6 +190,8 @@ class CartController extends Controller
 
         // IF STOCK ISSUE
         if (!empty($outOfStockCupcakes)) {
+            // delete all previous potentially updates
+            $cart->cupcakes()->detach();
             return response()->json([
                 "message" => "Certains cupcakes ne sont pas disponibles en quantité suffisante",
                 "outOfStockCupcakes" => $outOfStockCupcakes
